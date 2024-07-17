@@ -1,0 +1,48 @@
+import requests
+from bs4 import BeautifulSoup
+#スクレイピングしたいURLを入力
+url = input("対象URL:")
+#webページの取得
+try:
+    respons = requests.get(url)
+    respons.raise_for_status()
+    #webページの解析
+    soup = BeautifulSoup(respons.text,"html.parser")
+
+    #タイトルを取得する
+    title = soup.title.string
+    print(f"Title{title}")
+
+    h2_tags = soup.find_all("h2")
+    if h2_tags:
+
+        for index, h2 in enumerate(h2_tags,start=1):
+            print(f"H2-{index}:{h2.get_text()}")
+    else:
+        print("h2タグが見つかりません")
+#クラス名"content"を持つdivタグを取得
+    div_tags = soup.find_all("div",class_="content")
+    if div_tags:
+        for index,div in enumerate(div_tags,start=1):
+            print(f"Div-{index}: {div.get_text()}")
+    else:
+        print("クラス名'content'を持つdivタグが見つかりません")
+#IDを持つタグを取得（footer）
+    specific_element = soup.find("div",id = "footer")
+    if specific_element:
+        print(f"Specific Element:{specific_element.get_text()}")
+    else:
+        print("指定されたIDを持つ要素が見つかりません")
+#cssセレクタを使って要素を取得
+    css_element = soup.select(".content")
+    if css_element:
+        for index, element in enumerate(css_element,start=1):
+            print(f"css Element-{index}:{element.get_text()}")
+    else:
+        print("指定されたクラス名を持つ要素が見つかりません")
+    
+except requests.exceptions.RequestException as e:
+    print(f"リクエストエラーが発生しました:{e}")
+
+except Exception as e:
+    print(f"エラーが発生しました:{e}")
